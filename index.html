@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🌿 Plant Identifier Tool 🪴</title>
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin:0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #eaf2f8;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a {
+    color: #0a71c5;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  header, footer {
+    background: #1b4f72;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  /* Header flex with logo left, nav right, language selector right next */
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+  }
+  .header-spacer {
+    flex-grow: 1;
+  }
+  nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+  nav a {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  nav a:hover,
+  nav a:focus {
+    text-decoration: underline;
+  }
+  #language-select {
+    margin-left: 1.5rem;
+    max-width: 160px;
+    background: white;
+    border-radius: 8px;
+    border: none;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1b4f72;
+    cursor: pointer;
+    outline-offset: 2px;
+  }
+  /* Footer */
+  footer {
+    font-size: 0.9rem;
+    justify-content: center;
+    background: #1b4f72;
+    color: white;
+  }
+  main {
+    flex-grow: 1;
+    padding: 1.5rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  h1, h2, h3 {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: #0b3c5d;
+  }
+  h1 {
+    font-size: 2.4rem;
+  }
+  .emoji {
+    margin-right: 0.4rem;
+  }
+  /* Upload & photo area */
+  .upload-section {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+    margin-bottom: 2rem;
+  }
+  /* New container for upload and photo inputs horizontally combined */
+  .upload-photo-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .upload-photo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1 1 200px;
+    min-width: 180px;
+  }
+  label {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  input[type=file] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #96c0db;
+    border-radius: 8px;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+  }
+  input[type=file]:focus {
+    border-color: #0a71c5;
+  }
+  button {
+    background: #0a71c5;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 0.7rem;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    font-size: 1rem;
+  }
+  button:hover {
+    background: #084a8a;
+  }
+  .buttons-inline {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  /* Table */
+  .result-section {
+    overflow-x: auto;
+    background: white;
+    padding: 1rem 1rem 1rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+    margin-bottom: 2rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+  }
+  thead tr {
+    background: #0a71c5;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  th, td {
+    border: 1px solid #d1e7ff;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) {
+    background: #f1f9ff;
+  }
+  /* Testimonials */
+  .testimonials {
+    margin-bottom: 2rem;
+  }
+  .testimonials h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .testimonial-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+  .testimonial-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.12);
+    padding: 1.25rem 1.5rem;
+    max-width: 350px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .testimonial-emoji {
+    font-size: 2.2rem;
+  }
+  .testimonial-text {
+    font-style: italic;
+    color: #444;
+    flex-grow: 1;
+  }
+  .testimonial-author {
+    font-weight: 700;
+    color: #0a71c5;
+    align-self: flex-end;
+  }
+  /* FAQ */
+  .faq-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+    margin-bottom: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .faq-section h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .faq-card {
+    border-bottom: 1px solid #d1e7ff;
+    padding: 1rem 0;
+    cursor: pointer;
+  }
+  .faq-question {
+    font-weight: 700;
+    color: #0a71c5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    color: #333;
+    margin-top: 0.3rem;
+  }
+  .faq-card.open .faq-answer {
+    max-height: 200px;
+  }
+  .faq-toggle-icon {
+    font-size: 1.5rem;
+    user-select: none;
+  }
+  /* Responsive */
+  @media (max-width: 768px) {
+    .testimonial-cards {
+      flex-direction: column;
+      align-items: center;
+    }
+    .upload-photo-container {
+      flex-direction: column;
+    }
+  }
+  /* Ad container placeholders */
+  .ad-slot {
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-label="Plant Identifier logo">
+    🌱 <span>Plant Identifier</span>
+  </div>
+  <div class="header-spacer" aria-hidden="true"></div>
+  <nav aria-label="Primary navigation">
+    <a href="#" aria-current="page">🏠 Home</a>
+    <a href="#identifier">🌿 Plant Identifier</a>
+    <a href="#privacy">🔒 Privacy</a>
+  </nav>
+  <select id="language-select" aria-label="Select Language">
+    <option value="en" selected>English 🇬🇧</option>
+    <option value="ur">اردو 🇵🇰</option>
+    <option value="hi">हिन्दी 🇮🇳</option>
+    <option value="sd">سنڌي 🇵🇰</option>
+  </select>
+</header>
+
+<!-- Google Ad Top -->
+<div class="ad-slot" id="ad-top" aria-label="Advertisement top banner">
+  <script type="text/javascript">
+	atOptions = {
+		'key' : '9e444108ce409887f1051df7ffb512e8',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	};
+  </script>
+  <script type="text/javascript" src="//www.highperformanceformat.com/9e444108ce409887f1051df7ffb512e8/invoke.js"></script>
+</div>
+
+<main>
+  <section id="identifier" class="upload-section" aria-label="Plant Identifier tool">
+    <h1>🌿 Plant Identifier</h1>
+    <p>Take a photo or upload an image of a plant to identify it with disease info and solution.</p>
+    <div class="upload-photo-container">
+      <div class="upload-photo-block">
+        <label for="image-upload" id="label-upload">📤 Upload Image</label>
+        <input type="file" accept="image/*" id="image-upload" aria-describedby="upload-desc" />
+        <p id="upload-desc" style="font-size: 0.85rem; color:#666; margin-top: 0;">Supported formats: JPG, PNG.</p>
+      </div>
+      <div class="upload-photo-block">
+        <label for="camera-input" id="label-camera">📷 Take Photo</label>
+        <input type="file" accept="image/*" capture="environment" id="camera-input" />
+      </div>
+    </div>
+    <div class="buttons-inline">
+      <button id="btn-identify" disabled>🔎 Identify Plant</button>
+      <button id="btn-download" disabled>⬇️ Download Results</button>
+      <button id="btn-copy" disabled>📋 Copy Results</button>
+    </div>
+  </section>
+
+  <!-- Google Ad Middle -->
+  <div class="ad-slot" id="ad-middle" aria-label="Advertisement middle banner">
+    <script type="text/javascript">
+	  atOptions = {
+		  'key' : '9e444108ce409887f1051df7ffb512e8',
+		  'format' : 'iframe',
+		  'height' : 90,
+		  'width' : 728,
+		  'params' : {}
+	  };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/9e444108ce409887f1051df7ffb512e8/invoke.js"></script>
+  </div>
+
+  <section class="result-section" aria-label="Plant identification results">
+    <h2>🔍 Results</h2>
+    <div style="overflow-x:auto;">
+      <table id="result-table" role="table" aria-live="polite" aria-relevant="all" aria-describedby="results-desc">
+        <thead>
+          <tr>
+            <th>🌱 Plant Name</th>
+            <th>🧬 Classification</th>
+            <th>🦠 Disease</th>
+            <th>🛠️ Solution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" style="text-align:center; color:#666;">No results yet. Please upload or take a photo to identify a plant.</td></tr>
+        </tbody>
+      </table>
+      <p id="results-desc" class="sr-only">Table showing identified plant details, disease, and solution.</p>
+    </div>
+  </section>
+
+  <section class="testimonials" aria-label="User testimonials">
+    <h2>💬 What Our Users Say</h2>
+    <div class="testimonial-cards">
+      <article class="testimonial-card" tabindex="0">
+        <div class="testimonial-emoji" aria-hidden="true">🌟</div>
+        <p class="testimonial-text">Amazing tool! Identified my plant quickly and gave detailed care instructions. Highly recommend! 🌼🌞</p>
+        <div class="testimonial-author">- Sarah K.</div>
+      </article>
+      <article class="testimonial-card" tabindex="0">
+        <div class="testimonial-emoji" aria-hidden="true">🍃</div>
+        <p class="testimonial-text">Very helpful! The disease detection and solutions saved my garden from pests. 👍🌿</p>
+        <div class="testimonial-author">- Rajesh M.</div>
+      </article>
+      <article class="testimonial-card" tabindex="0">
+        <div class="testimonial-emoji" aria-hidden="true">🌻</div>
+        <p class="testimonial-text">Loved the language support and how easy the interface is. Perfect for beginners and experts alike! 👩‍🌾👨‍🌾</p>
+        <div class="testimonial-author">- Ayesha S.</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="faq-section" aria-label="Frequently Asked Questions">
+    <h2>❓ FAQs</h2>
+
+    <div class="faq-card" tabindex="0">
+      <div class="faq-question" role="button" aria-expanded="false" aria-controls="faq1-answer" id="faq1-question">
+        How accurate is the plant identification? <span class="faq-toggle-icon">+</span>
+      </div>
+      <div class="faq-answer" id="faq1-answer" aria-labelledby="faq1-question" role="region">
+        Our algorithm provides a high accuracy rate but identification depends on image quality and plant variety.
+      </div>
+    </div>
+
+    <div class="faq-card" tabindex="0">
+      <div class="faq-question" role="button" aria-expanded="false" aria-controls="faq2-answer" id="faq2-question">
+        Which diseases can the tool identify? <span class="faq-toggle-icon">+</span>
+      </div>
+      <div class="faq-answer" id="faq2-answer" aria-labelledby="faq2-question" role="region">
+        It detects common fungal, bacterial, and pest-related diseases specific to a wide variety of plants.
+      </div>
+    </div>
+
+    <div class="faq-card" tabindex="0">
+      <div class="faq-question" role="button" aria-expanded="false" aria-controls="faq3-answer" id="faq3-question">
+        Can I use the tool offline? <span class="faq-toggle-icon">+</span>
+      </div>
+      <div class="faq-answer" id="faq3-answer" aria-labelledby="faq3-question" role="region">
+        Currently, the tool requires an internet connection to process images and deliver results.
+      </div>
+    </div>
+
+    <div class="faq-card" tabindex="0">
+      <div class="faq-question" role="button" aria-expanded="false" aria-controls="faq4-answer" id="faq4-question">
+        How can I protect my plants after identifying a disease? <span class="faq-toggle-icon">+</span>
+      </div>
+      <div class="faq-answer" id="faq4-answer" aria-labelledby="faq4-question" role="region">
+        Follow the recommended solutions in the results table or consult a specialist for severe cases.
+      </div>
+    </div>
+
+    <div class="faq-card" tabindex="0">
+      <div class="faq-question" role="button" aria-expanded="false" aria-controls="faq5-answer" id="faq5-question">
+        Is my uploaded image data kept private? <span class="faq-toggle-icon">+</span>
+      </div>
+      <div class="faq-answer" id="faq5-answer" aria-labelledby="faq5-question" role="region">
+        Yes, your images and data are processed locally and not stored or shared.
+      </div>
+    </div>
+  </section>
+
+  <!-- Google Ad Bottom -->
+  <div class="ad-slot" id="ad-bottom" aria-label="Advertisement bottom banner">
+    <script type="text/javascript">
+	atOptions = {
+		'key' : '9e444108ce409887f1051df7ffb512e8',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	};
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/9e444108ce409887f1051df7ffb512e8/invoke.js"></script>
+  </div>
+</main>
+
+<!-- Google Ad Last -->
+<div class="ad-slot" id="ad-last" aria-label="Advertisement last banner" style="margin-bottom: 50px;">
+  <script type="text/javascript">
+	atOptions = {
+		'key' : '9e444108ce409887f1051df7ffb512e8',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	};
+  </script>
+  <script type="text/javascript" src="//www.highperformanceformat.com/9e444108ce409887f1051df7ffb512e8/invoke.js"></script>
+</div>
+
+<footer id="privacy" aria-label="Footer with Privacy">
+  <p>© 2024 Plant Identifier Tool | <a href="#privacy">Privacy Policy</a></p>
+</footer>
+
+<script>
+  (() => {
+    // Localized text for UI elements
+    const translations = {
+      en: {
+        uploadLabel: '📤 Upload Image',
+        cameraLabel: '📷 Take Photo',
+        identifyBtn: '🔎 Identify Plant',
+        downloadBtn: '⬇️ Download Results',
+        copyBtn: '📋 Copy Results',
+        noResults: 'No results yet. Please upload or take a photo to identify a plant.',
+        resultsTitle: '🔍 Results',
+        plantName: '🌱 Plant Name',
+        classification: '🧬 Classification',
+        disease: '🦠 Disease',
+        solution: '🛠️ Solution',
+      },
+      ur: {
+        uploadLabel: 'تصویر اپ لوڈ کریں 📤',
+        cameraLabel: 'تصویر لیں 📷',
+        identifyBtn: 'پودا شناخت کریں 🔎',
+        downloadBtn: 'نتائج ڈاؤن لوڈ کریں ⬇️',
+        copyBtn: 'نتائج کاپی کریں 📋',
+        noResults: 'کوئی نتائج نہیں۔ براہ کرم تصویر اپ لوڈ کریں یا تصویر لیں۔',
+        resultsTitle: '🔍 نتائج',
+        plantName: '🌱 پودے کا نام',
+        classification: '🧬 درجہ بندی',
+        disease: '🦠 بیماری',
+        solution: '🛠️ حل',
+      },
+      hi: {
+        uploadLabel: 'छवि अपलोड करें 📤',
+        cameraLabel: 'फोटो लें 📷',
+        identifyBtn: 'पौधा पहचानें 🔎',
+        downloadBtn: 'परिणाम डाउनलोड करें ⬇️',
+        copyBtn: 'परिणाम कॉपी करें 📋',
+        noResults: 'कोई परिणाम नहीं। कृपया छवि अपलोड करें या फोटो लें।',
+        resultsTitle: '🔍 परिणाम',
+        plantName: '🌱 पौधे का नाम',
+        classification: '🧬 वर्गीकरण',
+        disease: '🦠 बीमारी',
+        solution: '🛠️ समाधान',
+      },
+      sd: {
+        uploadLabel: 'تصوير اپلوڊ ڪريو 📤',
+        cameraLabel: 'تصوير وٺو 📷',
+        identifyBtn: 'ٻوٽو سڃاڻپ ڪريو 🔎',
+        downloadBtn: 'نتيجا ڊائونلوڊ ڪريو ⬇️',
+        copyBtn: 'نتيجا ڪاپي ڪريو 📋',
+        noResults: 'ڪوبه نتيجا ناھي. مهرباني ڪري تصوير اپلوڊ يا وٺو.',
+        resultsTitle: '🔍 نتيجا',
+        plantName: '🌱 ٻوٽي جو نالو',
+        classification: '🧬 درجا بندي',
+        disease: '🦠 بيماري',
+        solution: '🛠️ حل',
+      }
+    };
+
+    // Plant data with translations
+    const plantData = [
+      {
+        name: {
+          en: "Ficus lyrata (Fiddle Leaf Fig)",
+          ur: "فِکس لائریٹا (فِڈل لیف فِگ)",
+          hi: "फिक्स लाइराटा (फ़िडल लीफ़ फिग)",
+          sd: "فيڪس ليرٽيٽا (فڊل ليپ فِگ)"
+        },
+        classification: {
+          en: "Kingdom: Plantae > Family: Moraceae > Genus: Ficus > Species: lyrata",
+          ur: "بادشاہت: پودے > خاندان: موراسیسی > جنس: فِکس > نوع: لائریٹا",
+          hi: "राज्य: प्लांटे > परिवार: मोरासीसी > वंश: फिक्स > प्रजाति: लाइराटा",
+          sd: "بادشاهت: ٻوٽا > خاندان: موراسي > جنس: فيڪس > قسم: ليرٽيٽا"
+        },
+        disease: {
+          en: "Root Rot",
+          ur: "جڑوں کی سڑن",
+          hi: "जड़ सड़ना",
+          sd: "جڙون کي سڙڻ"
+        },
+        solution: {
+          en: "Reduce watering and improve soil drainage to avoid excess moisture.",
+          ur: "پانی دینے کو کم کریں اور مٹی کی نکاسی کو بہتر بنائیں تاکہ زیادہ نمی سے بچا جا سکے۔",
+          hi: "पानी कम करें और अत्यधिक नमी से बचने के लिए मिट्टी की निकासी सुधारें।",
+          sd: "پاڻي ڏيڻ گهٽايو ۽ مٽي جي نيڪاسي بهتر ڪريو ته جيئن زياده نمي کان بچي سگهجي."
+        }
+      },
+      {
+        name: {
+          en: "Monstera deliciosa",
+          ur: "مونسٹیرا ڈیلیشیوسا",
+          hi: "मॉन्स्टेरा डेलिसियोसा",
+          sd: "مونسٽيرا ڊيلشيوسا"
+        },
+        classification: {
+          en: "Kingdom: Plantae > Family: Araceae > Genus: Monstera > Species: deliciosa",
+          ur: "بادشاہت: پودے > خاندان: آریسی > جنس: مونسٹیرا > نوع: ڈیلیشیوسا",
+          hi: "राज्य: प्लांटे > परिवार: अरैसी > वंश: मॉन्स्टेरा > प्रजाति: डेलिसियोसा",
+          sd: "بادشاهت: ٻوٽا > خاندان: آريسي > جنس: مونسٽيرا > قسم: ڊيلشيوسا"
+        },
+        disease: {
+          en: "Leaf Spot",
+          ur: "پتے پر دھبے",
+          hi: "पत्ती पर धब्बा",
+          sd: "پنن جا داغ"
+        },
+        solution: {
+          en: "Remove affected leaves and apply fungicide as needed.",
+          ur: "متاثرہ پتے ہٹائیں اور ضرورت کے مطابق فنگسائڈ لگائیں۔",
+          hi: "प्रभावित पत्ते हटा दें और आवश्यकता अनुसार फंगीसाइड लगाएं।",
+          sd: "متاثر ٿيل پنن کي ہٽايو ۽ ضرورت پوڻ تي فنگسائڊ لاڳو ڪريو."
+        }
+      },
+      {
+        name: {
+          en: "Rosa rubiginosa (Sweet Briar Rose)",
+          ur: "گلاب روبیجنوزا (میٹھا بریار گلاب)",
+          hi: "रोजा रुबिजिनोसा (स्वीट ब्रायर रोज़)",
+          sd: "رزا روبیگنوسا (مٺڙو بريار گلاب)"
+        },
+        classification: {
+          en: "Kingdom: Plantae > Family: Rosaceae > Genus: Rosa > Species: rubiginosa",
+          ur: "بادشاہت: پودے > خاندان: روزیسی > جنس: گلاب > نوع: روبیجنوزا",
+          hi: "राज्य: प्लांटे > परिवार: रोज़ेसी > वंश: रोजा > प्रजाति: रुबिजिनोसा",
+          sd: "بادشاهت: ٻوٽا > خاندان: روزاCe > جنس: رزا > قسم: روبیگنوسا"
+        },
+        disease: {
+          en: "Black Spot",
+          ur: "کالا دھبہ",
+          hi: "ब्लैक स्पॉट",
+          sd: "ڪارو داغ"
+        },
+        solution: {
+          en: "Prune affected parts and apply fungicide; avoid wetting foliage.",
+          ur: "متاثرہ حصوں کو تراشیں اور فنگسائڈ لگائیں؛ پتیوں کو گیلا ہونے سے بچائیں۔",
+          hi: "प्रभावित हिस्सों को छांटें और फंगीसाइड लगाएं; पत्तियों को गीला होने से बचाएं।",
+          sd: "متاثر ٿيل حصن کي ترايو ۽ فنگسائڊ لاڳو ڪيو؛ پنن کي گلي ٿيڻ کان بچايو."
+        }
+      }
+    ];
+
+    // Elements references
+    const langSelect = document.getElementById('language-select');
+    const labelUpload = document.getElementById('label-upload');
+    const labelCamera = document.getElementById('label-camera');
+    const btnIdentify = document.getElementById('btn-identify');
+    const btnDownload = document.getElementById('btn-download');
+    const btnCopy = document.getElementById('btn-copy');
+    const resultTable = document.getElementById('result-table');
+    const resultSectionTitle = document.querySelector('.result-section h2');
+
+    // Inputs
+    const imageUpload = document.getElementById('image-upload');
+    const cameraInput = document.getElementById('camera-input');
+
+    let currentLang = 'en';
+    let currentResults = []; // will hold plant objects as is, but displayed in currentLang
+
+    function setLanguage(lang) {
+      if (!translations[lang]) return;
+      currentLang = lang;
+      // Update UI texts
+      labelUpload.textContent = translations[lang].uploadLabel;
+      labelCamera.textContent = translations[lang].cameraLabel;
+      btnIdentify.textContent = translations[lang].identifyBtn;
+      btnDownload.textContent = translations[lang].downloadBtn;
+      btnCopy.textContent = translations[lang].copyBtn;
+      resultSectionTitle.textContent = translations[lang].resultsTitle;
+
+      // Update table headers
+      const ths = resultTable.querySelectorAll('thead th');
+      ths[0].textContent = translations[lang].plantName;
+      ths[1].textContent = translations[lang].classification;
+      ths[2].textContent = translations[lang].disease;
+      ths[3].textContent = translations[lang].solution;
+
+      // Update no results row or refresh displayed results in new language
+      if (currentResults.length === 0) {
+        const tbody = resultTable.querySelector('tbody');
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">${translations[lang].noResults}</td></tr>`;
+        btnDownload.disabled = true;
+        btnCopy.disabled = true;
+      } else {
+        // re-display results in selected language
+        displayResults(currentResults);
+      }
+    }
+
+    // FAQ toggle
+    const faqCards = document.querySelectorAll('.faq-card');
+    faqCards.forEach(card => {
+      const question = card.querySelector('.faq-question');
+      question.addEventListener('click', () => {
+        const expanded = question.getAttribute('aria-expanded') === 'true';
+        faqCards.forEach(c => {
+          c.classList.remove('open');
+          c.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+          c.querySelector('.faq-toggle-icon').textContent = '+';
+        });
+        if (!expanded) {
+          card.classList.add('open');
+          question.setAttribute('aria-expanded', 'true');
+          question.querySelector('.faq-toggle-icon').textContent = '−';        
+        }
+      });
+    });
+
+    // Enable identify button only if any image selected
+    function checkInputs() {
+      btnIdentify.disabled = !(imageUpload.files.length > 0 || cameraInput.files.length > 0);
+    }
+    imageUpload.addEventListener('change', () => {
+      if (imageUpload.files.length > 0) cameraInput.value = '';
+      checkInputs();
+    });
+    cameraInput.addEventListener('change', () => {
+      if (cameraInput.files.length > 0) imageUpload.value = '';
+      checkInputs();
+    });
+
+    // Simulated plant identification function returns plantData (multilingual keys)
+    function simulatePlantIdentification() {
+      // In a real app, this would call a backend or ML model for real data.
+      // Return global plantData directly.
+      return plantData;
+    }
+
+    // Populate the table with results in current language
+    function displayResults(results) {
+      currentResults = results;
+      const tbody = resultTable.querySelector('tbody');
+      if (!results || results.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">${translations[currentLang].noResults}</td></tr>`;
+        btnDownload.disabled = true;
+        btnCopy.disabled = true;
+        return;
+      }
+      btnDownload.disabled = false;
+      btnCopy.disabled = false;
+
+      let rows = '';
+      for (const r of results) {
+        rows += `<tr>
+          <td>${r.name[currentLang]}</td>
+          <td>${r.classification[currentLang]}</td>
+          <td>${r.disease[currentLang]}</td>
+          <td>${r.solution[currentLang]}</td>
+        </tr>`;
+      }
+      tbody.innerHTML = rows;
+    }
+
+    // Identify button click handler
+    btnIdentify.addEventListener('click', () => {
+      // Simulate delay to mimic processing
+      btnIdentify.disabled = true;
+      btnIdentify.textContent = '⏳ Processing...';
+      setTimeout(() => {
+        const results = simulatePlantIdentification();
+        displayResults(results);
+        btnIdentify.textContent = translations[currentLang].identifyBtn;
+        checkInputs();
+      }, 1200);
+    });
+
+    // Download results CSV
+    btnDownload.addEventListener('click', () => {
+      if (currentResults.length === 0) return;
+      const headers = [
+        translations[currentLang].plantName,
+        translations[currentLang].classification,
+        translations[currentLang].disease,
+        translations[currentLang].solution
+      ];
+      const csvRows = [headers.join(',')];
+      for (const r of currentResults) {
+        // Escape potential commas in data by wrapping in quotes
+        csvRows.push([
+          `"${r.name[currentLang]}"`,
+          `"${r.classification[currentLang]}"`,
+          `"${r.disease[currentLang]}"`,
+          `"${r.solution[currentLang]}"`
+        ].join(','));
+      }
+      const csvString = csvRows.join('\n');
+      const blob = new Blob([csvString], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'plant_identification_results.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // Copy results to clipboard
+    btnCopy.addEventListener('click', () => {
+      if (currentResults.length === 0) return;
+      let text = '';
+      const headers = [
+        translations[currentLang].plantName,
+        translations[currentLang].classification,
+        translations[currentLang].disease,
+        translations[currentLang].solution
+      ];
+      text += headers.join('\t') + '\n';
+      for (const r of currentResults) {
+        text += `${r.name[currentLang]}\t${r.classification[currentLang]}\t${r.disease[currentLang]}\t${r.solution[currentLang]}\n`;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Results copied to clipboard!');
+      }).catch(() => {
+        alert('❌ Failed to copy results.');
+      });
+    });
+
+    // Initialize language and UI
+    setLanguage(currentLang);
+
+    // Change language on select
+    langSelect.addEventListener('change', e => {
+      setLanguage(e.target.value);
+    });
+  })();
+</script>
+</body>
+</html>
+
